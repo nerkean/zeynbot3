@@ -721,7 +721,7 @@ function logout() {
     console.log("Выход из аккаунта");
     shopDataCache = null; // Очищаем кэш данных магазина
     cachedProfileData = {}; // Очищаем кэш данных профиля
-    window.location.href = 'https://prismatic-caramel-fba963.netlify.app';
+    window.location.href = 'http://bandazeyna.com';
 }
 
 function showLoginButton() {
