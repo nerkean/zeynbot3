@@ -23,7 +23,7 @@ const client = new Client({
 });
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 const LEADERBOARD_CACHE_TTL = 5 * 60; // 5 минут в секундах
 
 const corsOptions = {
@@ -42,7 +42,7 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
     .catch(err => console.error('Ошибка подключения:', err));
 
     app.use(session({
-        secret: 'DYNASET1805!', // Replace with a strong, random secret
+        secret: process.env.SESSION_SECRET, // Replace with a strong, random secret
         resave: false,
         saveUninitialized: false,
         cookie: {
@@ -101,8 +101,8 @@ async function fetchUserGuildMember(userId) {
 }
 
 passport.use(new DiscordStrategy({
-    clientID: '1193621998505566350',
-    clientSecret: 'dj2kcyHwAdyTkyjc8UciOr2vsvd6SvzY',
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET',
     callbackURL: 'https://zeynbot3.onrender.com/auth/callback',
     scope: ['identify', 'guilds.members.read']
 },
