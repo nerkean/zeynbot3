@@ -27,7 +27,7 @@ const PORT = process.env.PORT || 10000;
 const LEADERBOARD_CACHE_TTL = 5 * 60; // 5 минут в секундах
 
 const corsOptions = {
-    origin: 'http://bandazeyna.com/',
+    origin: 'http://bandazeyna.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Разрешенные методы
     allowedHeaders: ['Content-Type', 'Authorization'], // Разрешенные заголовки
     optionsSuccessStatus: 200,
