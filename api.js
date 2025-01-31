@@ -24,12 +24,12 @@ const client = new Client({
 
 const app = express();
 const PORT = process.env.PORT || 10000;
-const LEADERBOARD_CACHE_TTL = 5 * 60; // 5 минут в секундах
+const LEADERBOARD_CACHE_TTL = 5 * 60;f
 
 const corsOptions = {
     origin: 'https://bandazeyna.com',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Разрешенные методы
-    allowedHeaders: ['Content-Type', 'Authorization'], // Разрешенные заголовки
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 200,
     credentials: true
 };
@@ -42,11 +42,11 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
     .catch(err => console.error('Ошибка подключения:', err));
 
     app.use(session({
-        secret: process.env.SESSION_SECRET, // Replace with a strong, random secret
+        secret: process.env.SESSION_SECRET, 
         resave: false,
         saveUninitialized: false,
         cookie: {
-            secure: false, // Set to true in production with HTTPS
+            secure: false, 
             maxAge: 24 * 60 * 60 * 1000,
         }
     }));
@@ -54,14 +54,14 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
     app.use(passport.session());
 
     passport.serializeUser((user, done) => {
-        done(null, user._id); //  <--- IMPORTANT: Serialize using the _id from MongoDB
+        done(null, user._id); 
     });
     
     passport.deserializeUser(async (id, done) => {
         try {
-            const user = await CommandStats.findById(id); // No need for.select('_id') now
+            const user = await CommandStats.findById(id);
             if (!user) {
-                return done(new Error('User not found')); // Handle the case where the user is not found
+                return done(new Error('User not found')); 
             }
             done(null, user);
         } catch (err) {
@@ -331,7 +331,7 @@ app.get('/achievements/:uuid', async (req, res) => {
             };
         });
 
-        cache.set(cacheKey, userAchievements, 300); // Кэшируем на 5 минут
+        cache.set(cacheKey, userAchievements, 300); 
         res.json(userAchievements);
     } catch (error) {
         console.error('Ошибка:', error);
