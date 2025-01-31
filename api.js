@@ -448,17 +448,6 @@ app.get('/auth/discord', (req, res, next) => {
     passport.authenticate('discord')(req, res, next)
 });
 
-app.get('/callback',
-    passport.authenticate('discord', { failureRedirect: '/' }),
-    async (req, res) => {
-        const user = await CommandStats.findOne({ userId: req.user.userId }).select('uuid');
-        if (!user) {
-            return res.status(404).send('User not found');
-        }
-        res.redirect(`https://bandazeyna.com?uuid=${user.uuid}`);
-    }
-);
-
 app.get('/auth/callback',
     passport.authenticate('discord', { failureRedirect: '/' }), // Handle failure
     async (req, res) => {
