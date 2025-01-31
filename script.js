@@ -335,7 +335,7 @@ async function fetchShopData() {
         return shopDataCache;
     }
     try {
-        const response = await fetch(`https://zeynbot3.onrender.com/shop`);
+        const response = await fetch(`https://bandazeyna.com/shop`);
         if (!response.ok) {
             const errorText = await response.text();
             console.error(`Ошибка при получении данных магазина: ${response.status} ${response.statusText} - ${errorText}`);
