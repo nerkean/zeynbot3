@@ -724,19 +724,65 @@ body {
   }
 }
 
-@media (max-width: 768px) { 
+/* Стили для больших экранов (ширина больше 768px) */
+.container {
+  width: 80%;
+  margin: 0 auto;
+}
+
+
+.leaderboards-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+
+/* Стили для планшетов (ширина от 481px до 768px) */
+@media (max-width: 768px) {
+  .container {
+    width: 90%;
+  }
+
+  .profile-container {
+    width: 80%;
+  }
+
   .leaderboards-container {
-    flex-direction: column; /* Расположить таблицы лидеров друг под другом */
+    flex-direction: column;
+    align-items: center;
   }
 
   .leaderboard-voice, 
   .leaderboard-stars, 
   .leaderboard-messages {
-    width: 100%; /* Занять всю ширину контейнера */
+    width: 100%; 
+    margin-bottom: 20px;
+  }
+}
+
+/* Стили для мобильных телефонов (ширина до 480px) */
+
+@media (max-width: 480px) {
+  .container {
+    width: 100%;
+    padding: 10px;
   }
 
   .profile-container {
-    width: 100%; /* Занять всю ширину экрана */
-    overflow-x: auto; /* Добавить горизонтальную прокрутку, если нужно */
+    padding: 20px;
+  }
+
+  .profile-tabs {
+    flex-direction: column; /* Расположить табы друг под другом */
+  }
+
+  .profile-tab {
+    padding: 10px 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-username {
+    font-size: 1.8rem;
   }
 }
