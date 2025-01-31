@@ -24,7 +24,7 @@ const client = new Client({
 
 const app = express();
 const PORT = process.env.PORT || 10000;
-const LEADERBOARD_CACHE_TTL = 5 * 60;f
+const LEADERBOARD_CACHE_TTL = 5 * 60;
 
 const corsOptions = {
     origin: 'https://bandazeyna.com',
@@ -155,7 +155,7 @@ app.get('/leaderboard', async (req, res) => {
         const sortBy = req.query.sortBy || 'totalMessages';
         const cacheKey = `leaderboard_${sortBy}`;
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 100;
+        const limit = parseInt(req.query.limit) || 50;
         const skip = (page - 1) * limit;
 
         const cachedData = cache.get(cacheKey);
