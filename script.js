@@ -78,7 +78,7 @@ function displayProfileData(data) {
     if (!data || Object.keys(data).length === 0) return;
 
     if (data.userAvatar) {
-        profileAvatar.src = `https://zeynbot3.onrender.com/avatars/${data.userId}/${data.userAvatar}.webp`;
+        profileAvatar.src = `https://cdn.discordapp.com/avatars/${userId}/${userAvatar}.png`;
         profileAvatar.style.display = 'block';
     } else {
         profileAvatar.style.display = 'none';   
