@@ -78,7 +78,7 @@ function displayProfileData(data) {
     if (!data || Object.keys(data).length === 0) return;
 
     if (data.userAvatar) {
-        profileAvatar.src = `https://cdn.discordapp.com/avatars/${userId}/${userAvatar}.png`;
+        profileAvatar.src = `https://cdn.discordapp.com/avatars/${data.userId}/${data.userAvatar}.png`;
         profileAvatar.style.display = 'block';
     } else {
         profileAvatar.style.display = 'none';   
