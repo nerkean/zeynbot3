@@ -37,36 +37,43 @@ tabs.forEach(tab => {
 });
 
 async function fetchProfileData(uuid) {
+    console.log(`функция fetchProfileData(${uuid}) вызвана`);
     if (cachedProfileData[uuid]) {
+        console.log(`Данные профиля для ${uuid} были найдены в кэше`);
         return cachedProfileData[uuid];
     }
     try {
         const response = await fetch(`https://zeynbot3.onrender.com/profile/${uuid}`);
         if (!response.ok) {
-            console.error("Ошибка при получении данных профиля:", response.status, response.statusText);
-            throw new Error('Ошибка при получении данных');
+            const errorText = await response.text(); // Get error details from the server
+            console.error("Ошибка при получении данных профиля:", response.status, response.statusText, errorText);
+            throw new Error(`Ошибка при получении данных: ${response.status} - ${errorText}`);
         }
         const data = await response.json();
-        console.log("Полученные данные:", data)
+        console.log("Полученные данные профиля:", data);
         cachedProfileData[uuid] = data;
         return data;
     } catch (error) {
-        console.error(error);
+        console.error("Ошибка в fetchProfileData:", error);
         return {};
     }
 }
 
 async function fetchAchievementsData(uuid) {
+    console.log(`функция fetchAchievementsData(${uuid}) вызвана`);
     try {
         const response = await fetch(`https://zeynbot3.onrender.com/achievements/${uuid}`);
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Ошибка при получении данных об ачивках: ${response.status} ${response.statusText} - ${errorText}`);
+            console.error(`Ошибка при получении данных об ачивках: ${response.status} ${response.statusText} - ${errorText}`);
+            throw new Error(`Ошибка при получении данных об ачивках: ${response.status} - ${errorText}`);
         }
-        return await response.json();
+        const data = await response.json();
+        console.log("Полученные данные об ачивках:", data);
+        return data;
     } catch (error) {
-        console.error(error);
-        throw error;
+        console.error("Ошибка в fetchAchievementsData:", error);
+        throw error; // Re-throw the error to be handled by the caller
     }
 }
 
@@ -78,7 +85,7 @@ function displayProfileData(data) {
     if (!data || Object.keys(data).length === 0) return;
 
     if (data.userAvatar) {
-        profileAvatar.src = `https://cdn.discordapp.com/avatars/${data.userId}/${data.userAvatar}.png`;
+        profileAvatar.src = `https://zeynbot3.onrender.com/avatars/${data.userId}/${data.userAvatar}.webp`;
         profileAvatar.style.display = 'block';
     } else {
         profileAvatar.style.display = 'none';   
@@ -322,19 +329,24 @@ async function fetchMessagesByDate(uuid) {
 }
 
 async function fetchShopData() {
+    console.log("функция fetchShopData() вызвана");
     if (shopDataCache) {
+        console.log("Данные магазина найдены в кэше");
         return shopDataCache;
     }
     try {
         const response = await fetch(`https://zeynbot3.onrender.com/shop`);
         if (!response.ok) {
-            throw new Error('Ошибка при получении данных магазина');
+            const errorText = await response.text();
+            console.error(`Ошибка при получении данных магазина: ${response.status} ${response.statusText} - ${errorText}`);
+            throw new Error(`Ошибка при получении данных магазина: ${response.status} - ${errorText}`);
         }
         const data = await response.json();
+        console.log("Полученные данные магазина:", data);
         shopDataCache = data;
         return data;
     } catch (error) {
-        console.error(error);
+        console.error("Ошибка в fetchShopData:", error);
         return null;
     }
 }
@@ -477,6 +489,7 @@ async function displayShopData(uuid) {
 }
 
 async function buyItem(uuid, itemName, quantity) {
+    console.log(`функция buyItem(${uuid}, ${itemName}, ${quantity}) вызвана`);
     try {
         let userId = localStorage.getItem('userId');
 
@@ -485,6 +498,7 @@ async function buyItem(uuid, itemName, quantity) {
             userId = profileData.userId;
             localStorage.setItem('userId', userId);
         }
+        console.log("userId:", userId);
 
         const response = await fetch('https://zeynbot3.onrender.com/buy', {
             method: 'POST',
@@ -496,22 +510,23 @@ async function buyItem(uuid, itemName, quantity) {
 
         if (!response.ok) {
             const errorData = await response.json();
+            console.error("Ошибка при покупке товара:", response.status, response.statusText, errorData);
             throw new Error(errorData.error || 'Ошибка при покупке товара');
         }
 
         const data = await response.json();
-        console.log(data.message);
+        console.log("Результат покупки:", data);
         alert(data.message);
 
-        cachedProfileData[uuid] = null;
+        cachedProfileData[uuid] = null; // Invalidate cache
 
         const updatedProfileData = await fetchProfileData(uuid);
         displayProfileData(updatedProfileData);
 
-        shopDataCache = null;
+        shopDataCache = null; // Invalidate shop cache
         await displayShopData(uuid);
     } catch (error) {
-        console.error(error);
+        console.error("Ошибка в buyItem:", error);
         alert(error.message);
     }
 }
@@ -654,6 +669,7 @@ function checkDataLoading(data, loadingTimeout) {
 }
 
 async function main() {
+    console.log("функция main() вызвана");
     try {
 
         
@@ -675,16 +691,19 @@ async function main() {
             `%cДобро пожаловать на мой сайт! Настоятельно рекомендуем Вам ничего не изменять в хранилище и не вводить никаких команд в консоли. Такие действия могут привести к несанкционированному доступу к Вашему аккаунту, в том числе к возможности совершать покупки без Вашего согласия.`,
             `font-size: 1.5em;`
         );
+        console.log(
+            `%cНИ В КОЕМ СЛУЧАИ НЕ ДЕЛИТЕСЬ СВОИМИ ДАННЫМИ С ТРЕТЬИМИ ЛИЦАМИ А ИМЕННО СВОИМИ UUID, ТОКЕНАМИ ИЛИ ЛЮБЫМИ ДРУГИМИ ДАННЫМИ, КОТОРЫЕ МОГУТ ПРИВЕСТИ К НАРУШЕНИЮ ВАШЕЙ КОНФИДЕНЦИАЛЬНОСТИ И БЕЗОПАСНОСТИ`,
+            `color:rgb(157, 7, 7); font-size: 2em; font-weight: bold; text-shadow: 0 0 2px #0d2f63;`
+        );
 
         const loadingTimeout = setTimeout(() => {
             checkDataLoading({}, loadingTimeout);
         }, 30000);
 
         if (uuid) {
+            console.log("UUID найден:", uuid);
             const profileData = await fetchProfileData(uuid);
-
             checkDataLoading(profileData, loadingTimeout);
-
             displayProfileData(profileData);
 
             const achievementsData = await fetchAchievementsData(uuid);
@@ -700,13 +719,14 @@ async function main() {
             logoutButton.addEventListener('click', logout);
 
         } else {
+            console.log("UUID не найден");
             showLoginButton();
             const logoutButton = document.querySelector('.logout-button');
             logoutButton.style.display = 'none';
         }
         initializeLeaderboards();
     } catch (error) {
-        console.error("Ошибка при получении ачивок:", error);
+        console.error("Ошибка в main:", error);
         achievementsContainer.innerHTML = '<div style="color: white">Не удалось загрузить достижения</div>';
     }
 }
