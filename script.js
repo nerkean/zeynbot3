@@ -830,7 +830,7 @@ function createMessagesChart(data, label, days) {
 }
 
 async function displayMessagesChart(userId, period) {
-    showStatsContent(false);
+    showStatsContent(false); 
     const messagesByDate = await fetchMessagesByDate(userId);
     if (!messagesByDate) return;
 
@@ -849,11 +849,6 @@ async function displayMessagesChart(userId, period) {
     }
 
     createMessagesChart(messagesByDate, label, days);
-
-    const messagesChart = document.getElementById('messagesChart');
-    if (messagesChart) {
-        messagesChart.addEventListener('click', () => showStatsContent(true));
-    }
 }
 
 function showStatsContent(show) {
