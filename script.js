@@ -13,6 +13,11 @@ let shopDataCache = null;
 let cachedUuid = null;
 let cachedProfileData = {};
 
+function addConfettiToZaqush() {
+    const zaqushMessagesElement = document.querySelector('#messages-leaderboard td:nth-child(3)'); // Замените на ваш селектор
+  
+  }
+
 const allowedRoleIds = ['1043565185509630022', '1243243180800082001', '1075072592005824563', '1043614651444899991', '1043615386660257872'];
 const roleToPosition = {
     '1043615386660257872': '🐞 Хелпер',
@@ -43,9 +48,9 @@ async function fetchProfileData(uuid) {
         return cachedProfileData[uuid];
     }
     try {
-        const response = await fetch(`https://zeynbot3.onrender.com/profile/${uuid}`);
+        const response = await fetch(`https://bandazeyna.com/profile/${uuid}`);
         if (!response.ok) {
-            const errorText = await response.text(); 
+            const errorText = await response.text(); // Get error details from the server
             console.error("Ошибка при получении данных профиля:", response.status, response.statusText, errorText);
             throw new Error(`Ошибка при получении данных: ${response.status} - ${errorText}`);
         }
@@ -62,7 +67,7 @@ async function fetchProfileData(uuid) {
 async function fetchAchievementsData(uuid) {
     console.log(`функция fetchAchievementsData(${uuid}) вызвана`);
     try {
-        const response = await fetch(`https://zeynbot3.onrender.com/achievements/${uuid}`);
+        const response = await fetch(`https://bandazeyna.com/achievements/${uuid}`);
         if (!response.ok) {
             const errorText = await response.text();
             console.error(`Ошибка при получении данных об ачивках: ${response.status} ${response.statusText} - ${errorText}`);
@@ -73,7 +78,7 @@ async function fetchAchievementsData(uuid) {
         return data;
     } catch (error) {
         console.error("Ошибка в fetchAchievementsData:", error);
-        throw error; 
+        throw error; // Re-throw the error to be handled by the caller
     }
 }
 
@@ -301,7 +306,7 @@ function displayAchievementsData(achievements) {
 
 async function fetchLeaderboardData(sortBy) {
     try {
-        const response = await fetch(`https://zeynbot3.onrender.com/leaderboard?sortBy=${sortBy}`)
+        const response = await fetch(`https://bandazeyna.com/leaderboard?sortBy=${sortBy}`)
         if (!response.ok) {
             throw new Error('Ошибка при получении данных для таблицы лидеров');
         }
@@ -316,7 +321,7 @@ async function fetchLeaderboardData(sortBy) {
 
 async function fetchMessagesByDate(uuid) {
     try {
-        const response = await fetch(`https://zeynbot3.onrender.com/profile/${uuid}/messagesByDate`);
+        const response = await fetch(`https://bandazeyna.com/profile/${uuid}/messagesByDate`);
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`Ошибка при получении данных о сообщениях по дням: ${response.status} ${response.statusText} - ${errorText}`);
@@ -335,7 +340,7 @@ async function fetchShopData() {
         return shopDataCache;
     }
     try {
-        const response = await fetch(`https://zeynbot3.onrender.com/shop`);
+        const response = await fetch(`https://bandazeyna.com/shop`);
         if (!response.ok) {
             const errorText = await response.text();
             console.error(`Ошибка при получении данных магазина: ${response.status} ${response.statusText} - ${errorText}`);
@@ -500,7 +505,7 @@ async function buyItem(uuid, itemName, quantity) {
         }
         console.log("userId:", userId);
 
-        const response = await fetch('https://zeynbot3.onrender.com/buy', {
+        const response = await fetch('http://zeynbot3.onrender.com/buy', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -518,12 +523,12 @@ async function buyItem(uuid, itemName, quantity) {
         console.log("Результат покупки:", data);
         alert(data.message);
 
-        cachedProfileData[uuid] = null; 
+        cachedProfileData[uuid] = null; // Invalidate cache
 
         const updatedProfileData = await fetchProfileData(uuid);
         displayProfileData(updatedProfileData);
 
-        shopDataCache = null;
+        shopDataCache = null; // Invalidate shop cache
         await displayShopData(uuid);
     } catch (error) {
         console.error("Ошибка в buyItem:", error);
@@ -534,17 +539,20 @@ async function buyItem(uuid, itemName, quantity) {
 function displayLeaderboardData(data, tableId) {
     const leaderboardTableBody = document.querySelector(`#${tableId} tbody`);
     leaderboardTableBody.innerHTML = '';
-
+  
     data.forEach((user, index) => {
-        const row = document.createElement('tr');
-
-        const rankCell = document.createElement('td');
-        rankCell.textContent = index + 1;
-        row.appendChild(rankCell);
-
-        const usernameCell = document.createElement('td');
-        usernameCell.textContent = user.username;
-        row.appendChild(usernameCell);
+      const row = document.createElement('tr');
+      
+      const rankCell = document.createElement('td');
+      rankCell.textContent = index + 1;
+      rankCell.setAttribute('data-label', '#'); // Добавляем data-label
+      row.appendChild(rankCell);
+  
+      const usernameCell = document.createElement('td');
+      usernameCell.textContent = user.username;
+      usernameCell.setAttribute('data-label', 'Пользователь'); // Добавляем data-label
+      row.appendChild(usernameCell);
+  
 
         if (user.username === 'pillonmymind') {
             usernameCell.classList.add('easter-egg');
@@ -555,15 +563,22 @@ function displayLeaderboardData(data, tableId) {
 
         const valueCell = document.createElement('td');
         if (tableId === 'voice-leaderboard') {
-            valueCell.textContent = formatVoiceTime(user.voiceTime);
+          valueCell.textContent = formatVoiceTime(user.voiceTime);
+          valueCell.setAttribute('data-label', 'Время'); // Добавляем data-label
         } else if (tableId === 'stars-leaderboard') {
-            valueCell.textContent = `${Math.round(user.stars)} ⭐`;
+          valueCell.textContent = `${Math.round(user.stars)} ⭐`;
+          valueCell.setAttribute('data-label', 'Звёзды'); // Добавляем data-label
         } else if (tableId === 'messages-leaderboard') {
-            valueCell.textContent = user.totalMessages;
+          valueCell.textContent = user.totalMessages;
+          valueCell.setAttribute('data-label', 'Сообщения'); // Добавляем data-label
         }
         row.appendChild(valueCell);
 
         leaderboardTableBody.appendChild(row);
+
+        if (user.username === 'zaqush') {
+            row.classList.add('zaqush-row');
+        }
     });
 }
 
@@ -749,7 +764,7 @@ function showLoginButton() {
     loginButton.style.display = 'flex'; 
 
     loginButton.onclick = () => {
-        window.location.href = 'https://zeynbot3.onrender.com/auth/discord';
+        window.location.href = 'https://bandazeyna.com/auth/discord';
     };
 }
 
