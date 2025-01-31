@@ -723,3 +723,20 @@ body {
     width: calc(100% - 30px);
   }
 }
+
+@media (max-width: 768px) { 
+  .leaderboards-container {
+    flex-direction: column; /* Расположить таблицы лидеров друг под другом */
+  }
+
+  .leaderboard-voice, 
+  .leaderboard-stars, 
+  .leaderboard-messages {
+    width: 100%; /* Занять всю ширину контейнера */
+  }
+
+  .profile-container {
+    width: 100%; /* Занять всю ширину экрана */
+    overflow-x: auto; /* Добавить горизонтальную прокрутку, если нужно */
+  }
+}
