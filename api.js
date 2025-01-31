@@ -27,7 +27,7 @@ const PORT = process.env.PORT || 10000;
 const LEADERBOARD_CACHE_TTL = 5 * 60; // 5 минут в секундах
 
 const corsOptions = {
-    origin: 'http://bandazeyna.com',
+    origin: 'https://bandazeyna.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Разрешенные методы
     allowedHeaders: ['Content-Type', 'Authorization'], // Разрешенные заголовки
     optionsSuccessStatus: 200,
@@ -455,7 +455,7 @@ app.get('/callback',
         if (!user) {
             return res.status(404).send('User not found');
         }
-        res.redirect(`http://bandazeyna.com?uuid=${user.uuid}`);
+        res.redirect(`https://bandazeyna.com?uuid=${user.uuid}`);
     }
 );
 
@@ -467,7 +467,7 @@ app.get('/auth/callback',
             if (!user) {
                 return res.status(404).send('User not found');
             }
-            res.redirect(`http://bandazeyna.com?uuid=${user.uuid}`);
+            res.redirect(`https://bandazeyna.com?uuid=${user.uuid}`);
         } catch (error) {
             console.error("Error in /auth/callback:", error);
             res.status(500).send("An error occurred during authentication.");
