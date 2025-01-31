@@ -1,4 +1,3 @@
-/* Optimized and improved CSS for your website */
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Roboto+Mono:wght@400;600&display=swap');
 
 :root {
@@ -32,6 +31,7 @@ body {
   flex-direction: column;
   padding: 20px;
   overflow-x: hidden;
+  font-family: var(--font-family-roboto);
 }
 
 #particles-js {
