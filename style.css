@@ -279,22 +279,28 @@ body {
 .leaderboard-voice,
 .leaderboard-stars,
 .leaderboard-messages {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  box-shadow: 0 10px 30px var(--shadow-color);
-  padding: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  animation: fadeInUp 1s ease;
-  width: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    padding: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: fadeInUp 1s ease;
+    width: 100%; /* Убрал дублирование */
 }
 
 .leaderboard-voice h2,
 .leaderboard-stars h2,
 .leaderboard-messages h2 {
-  margin-bottom: 20px;
-  font: 700 1.5rem var(--font-family-raleway);
-  color: var(--text-color-light);
-  text-align: center;
+    margin-bottom: 20px;
+    font: 700 1.5rem var(--font-family-raleway);
+    color: var(--text-color-light);
+    text-align: center;
+}
+
+/* Стили для больших экранов (ширина больше 768px) */
+.container {
+    width: 80%;
+    margin: 0 auto;
 }
 
 .leaderboard-table tr:nth-child(1) td:first-child {
@@ -551,10 +557,64 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
+@media (max-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+
+  .leaderboard-table td {
+    font-size: 14px;
+  }
+
+  .profile-tab {
+    padding: 15px;
+  }
+
+  /* Адаптивная таблица (способ 3) */
+  .leaderboard-table {
+    border: 0;
+  }
+
+  .leaderboard-table thead {
+    display: none;
+  }
+
+  .leaderboard-table tr {
+    margin-bottom: 10px;
+    display: block;
+    border: 1px solid #ddd;
+  }
+
+  .leaderboard-table td {
+    display: block;
+    text-align: right;
+    border-bottom: 1px dotted #ccc;
+    padding-left: 50%;
+    position: relative;
+  }
+
+  .leaderboard-table td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    width: 45%;
+    padding-left: 15px;
+    font-weight: bold;
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaderboard-stars {
+    display: none;
+  }
+}
+
 .logout-button {
   position: fixed;
   top: 20px;
   right: 20px;
+  margin-top: 10px;
   background-color: #FF4500;
   color: var(--text-color-light);
   border: none;
@@ -578,6 +638,7 @@ body {
   justify-content: space-between;
   gap: 30px;
   margin-bottom: 40px;
+  overflow-x: auto;
 }
 
 .leaderboard-wrapper {
@@ -762,7 +823,6 @@ body {
 
 /* Стили для мобильных телефонов (ширина до 480px) */
 
-@media (max-width: 400px) {
   .container {
     width: 100%;
     padding: 10px;
@@ -773,16 +833,64 @@ body {
   }
 
   .profile-tabs {
-    flex-direction: column; /* Расположить табы друг под другом */
-  }
-
-  .profile-tab {
-    padding: 10px 15px;
-  }
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+}
+.profile-tab {
+  margin: 5px;
 }
 
 @media (max-width: 480px) {
   .profile-username {
     font-size: 1.8rem;
+  }
+}
+
+
+@media (hover: hover) {
+  :root {
+    --red: red;
+    --orange: orange;
+    --yellow: yellow;
+    --green: green;
+    --blue: blue;
+    --indigo: indigo;
+    --violet: violet;
+  }
+
+  #messages-leaderboard tr.zaqush-row td:nth-child(3):hover {
+    animation: rainbow-text 3s linear infinite, rainbow-glow 0.5s linear infinite 0.2s; /* Добавлена задержка 0.2s для тени */
+  }
+
+  @keyframes rainbow-text {
+    0% { color: var(--red); }
+    7% { color: rgb(255, 128, 0); } /* Более плавные переходы */
+    14% { color: var(--orange); }
+    21% { color: rgb(255, 255, 0); }
+    28% { color: var(--yellow); }
+    35% { color: rgb(128, 255, 0); }
+    42% { color: var(--green); }
+    49% { color: rgb(0, 255, 128); }
+    57% { color: var(--blue); }
+    64% { color: rgb(0, 128, 255); }
+    71% { color: var(--indigo); }
+    78% { color: rgb(128, 0, 255); }
+    85% { color: var(--violet); }
+    92% { color: rgb(255, 0, 128); }
+    100% { color: var(--red); }
+  }
+
+  @keyframes rainbow-glow {
+    0% { text-shadow: 0 0 10px var(--red); }
+    14% { text-shadow: 0 0 10px var(--orange); }
+    28% { text-shadow: 0 0 10px var(--yellow); }
+    42% { text-shadow: 0 0 10px var(--green); }
+    57% { text-shadow: 0 0 10px var(--blue); }
+    71% { text-shadow: 0 0 10px var(--indigo); }
+    85% { text-shadow: 0 0 10px var(--violet); }
+    100% { text-shadow: 0 0 10px var(--red); }
   }
 }
