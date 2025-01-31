@@ -54,15 +54,19 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
     app.use(passport.session());
 
     passport.serializeUser((user, done) => {
-        done(null, user._id); 
+        console.log("Сериализация пользователя:", user._id);
+        done(null, user._id);
     });
     
     passport.deserializeUser(async (id, done) => {
+        console.log("Десериализация пользователя:", id);
         try {
             const user = await CommandStats.findById(id);
             if (!user) {
-                return done(new Error('User not found')); 
+                console.log("Пользователь не найден при десериализации");
+                return done(new Error('User not found'));
             }
+            console.log("Десериализованный пользователь:", user);
             done(null, user);
         } catch (err) {
             console.error("Ошибка при десериализации пользователя:", err);
@@ -77,10 +81,13 @@ const BOT_TOKEN = process.env.TOKEN
 let userGuildMemberCache = {};
 
 async function fetchUserGuildMember(userId) {
+    console.log(`Попытка получить пользователя ${userId} из кэша`);
     if (userGuildMemberCache[userId]) {
+        console.log(`Пользователь ${userId} найден в кэше`);
         return userGuildMemberCache[userId];
     }
     try {
+        console.log(`Запрос данных пользователя ${userId} с Discord API`);
         const response = await fetch(`https://discord.com/api/guilds/${GUILD_ID}/members/${userId}`, {
             headers: {
                 Authorization: `Bot ${BOT_TOKEN}`,
@@ -88,10 +95,13 @@ async function fetchUserGuildMember(userId) {
         });
 
         if (!response.ok) {
+            const errorData = await response.json(); // Try to get error details
+            console.error(`Ошибка получения данных пользователя ${userId}: ${response.status} ${response.statusText}`, errorData);
             throw new Error(`Failed to fetch user guild member: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
+        console.log(`Данные пользователя ${userId} успешно получены:`, data);
         userGuildMemberCache[userId] = data;
         return data;
     } catch (error) {
@@ -107,10 +117,13 @@ passport.use(new DiscordStrategy({
     scope: ['identify', 'guilds.members.read']
 },
 async (accessToken, refreshToken, profile, done) => {
+    console.log("Сработал обратный вызов Discord Strategy");
     try {
+        console.log("Профиль с дискорда:", profile);
         let user = await CommandStats.findOne({ userId: profile.id, serverId: GUILD_ID }).lean();
 
         if (!user) {
+            console.log("Новый пользователь, создание записи в БД");
             user = new CommandStats({
                 userId: profile.id,
                 serverId: GUILD_ID,
@@ -119,13 +132,15 @@ async (accessToken, refreshToken, profile, done) => {
                 roleAcquisitionDates: {}
             });
         } else {
+            console.log("Существующий пользователь, обновление данных");
             user.username = profile.username;
             user.userAvatar = profile.avatar;
         }
 
         const userGuildMember = await fetchUserGuildMember(profile.id);
         if (!userGuildMember) {
-            throw new Error('Failed to fetch user guild member');
+            console.error('Не удалось получить данные пользователя с сервера Discord');
+            return done(new Error('Failed to fetch user guild member')); // Important: Handle the error
         }
 
         const userRolesIds = userGuildMember.roles;
@@ -139,11 +154,13 @@ async (accessToken, refreshToken, profile, done) => {
         }
 
         user.roleAcquisitionDates = roleAcquisitionDates;
+        console.log("Данные пользователя перед сохранением:", user);
         await CommandStats.updateOne({ userId: profile.id, serverId: GUILD_ID }, user, { upsert: true });
+        console.log("Данные пользователя успешно сохранены/обновлены");
 
         return done(null, user);
     } catch (err) {
-        console.error(err);
+        console.error("Ошибка в Discord Strategy:", err);
         return done(err);
     }
 }));
@@ -475,7 +492,11 @@ app.get('/logout', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 API сервер запущен`);
+    console.log(`🚀 API сервер запущен на порту ${PORT}`);
+});
+
+client.on('ready', () => {
+    console.log(`Бот Discord готов к работе: ${client.user.tag}`);
 });
 
 client.login(process.env.TOKEN);
