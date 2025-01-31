@@ -23,7 +23,7 @@ const client = new Client({
 });
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 const LEADERBOARD_CACHE_TTL = 5 * 60;
 
 const corsOptions = {
@@ -113,7 +113,7 @@ async function fetchUserGuildMember(userId) {
 passport.use(new DiscordStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: 'https://zeynbot3.onrender.com/auth/callback',
+    callbackURL: 'https://bandazeyna.com/auth/callback',
     scope: ['identify', 'guilds.members.read']
 },
 async (accessToken, refreshToken, profile, done) => {
