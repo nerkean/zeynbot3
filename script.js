@@ -721,7 +721,7 @@ function logout() {
     console.log("Выход из аккаунта");
     shopDataCache = null; // Очищаем кэш данных магазина
     cachedProfileData = {}; // Очищаем кэш данных профиля
-    window.location.href = 'http://bandazeyna.com';
+    window.location.href = 'https://bandazeyna.com';
 }
 
 function showLoginButton() {
