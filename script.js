@@ -829,7 +829,7 @@ function createMessagesChart(data, label, days) {
     });
 }
 
-function displayMessagesChart(userId, period) {
+async function displayMessagesChart(userId, period) {
     showStatsContent(false);
     const messagesByDate = await fetchMessagesByDate(userId);
     if (!messagesByDate) return;
