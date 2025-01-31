@@ -9,9 +9,9 @@ const profileAvatar = document.querySelector('.profile-avatar');
 const profileHeader = document.querySelector('.profile-header');
 const shopItemsContainer = document.querySelector('.shop-items');
 const errorContainer = document.getElementById('error-container');
-let shopDataCache = null; // Кэш для данных магазина
-let cachedUuid = null; // Кэш для uuid
-let cachedProfileData = {}; // Кэш для данных профиля
+let shopDataCache = null; 
+let cachedUuid = null;
+let cachedProfileData = {};
 
 const allowedRoleIds = ['1043565185509630022', '1243243180800082001', '1075072592005824563', '1043614651444899991', '1043615386660257872'];
 const roleToPosition = {
@@ -153,7 +153,6 @@ function displayProfileData(data) {
     profileStatsContainer.innerHTML = '';
     profileStaffStatsContainer.innerHTML = '';
 
-    // Оптимизируем создание элементов статистики
     requestAnimationFrame(() => {
         statsBlocks.forEach(block => {
             const blockElement = document.createElement('div');
@@ -349,7 +348,6 @@ async function displayShopData(uuid) {
     const shopData = await fetchShopData();
     if (!shopData) return;
 
-    // Очищаем контейнер только если он не пустой
     if (shopItemsContainer.firstChild) {
         shopItemsContainer.innerHTML = '';
     }
@@ -505,13 +503,11 @@ async function buyItem(uuid, itemName, quantity) {
         console.log(data.message);
         alert(data.message);
 
-        // Сбрасываем кэш данных профиля, чтобы при следующем запросе данные снова загрузились с сервера
         cachedProfileData[uuid] = null;
 
         const updatedProfileData = await fetchProfileData(uuid);
         displayProfileData(updatedProfileData);
 
-        // Обновляем данные магазина после покупки
         shopDataCache = null;
         await displayShopData(uuid);
     } catch (error) {
@@ -719,8 +715,8 @@ function logout() {
     localStorage.removeItem('uuid');
     localStorage.removeItem('userId');
     console.log("Выход из аккаунта");
-    shopDataCache = null; // Очищаем кэш данных магазина
-    cachedProfileData = {}; // Очищаем кэш данных профиля
+    shopDataCache = null; 
+    cachedProfileData = {}; 
     window.location.href = 'https://bandazeyna.com';
 }
 
@@ -749,15 +745,12 @@ function createMessagesChart(data, label, days) {
     let chartCanvas = document.getElementById('messagesChart');
     let existingChart = Chart.getChart(chartCanvas);
 
-    // Проверяем, существует ли уже canvas
     if (!chartCanvas) {
-        // Если canvas не существует, создаем его
         chartCanvas = document.createElement('canvas');
         chartCanvas.id = 'messagesChart';
         chartCanvas.width = 400;
         chartCanvas.height = 200;
-
-        // Добавляем canvas в нужное место в DOM
+        
         const profileTabContent = document.querySelector('.profile-tab-content[data-tab="stats"]');
         profileTabContent.appendChild(chartCanvas);
         
@@ -817,7 +810,7 @@ function createMessagesChart(data, label, days) {
 }
 
 async function displayMessagesChart(userId, period) {
-    showStatsContent(false); // Скрываем контент перед отображением графика
+    showStatsContent(false); 
     const messagesByDate = await fetchMessagesByDate(userId);
     if (!messagesByDate) return;
 
