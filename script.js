@@ -45,7 +45,7 @@ async function fetchProfileData(uuid) {
     try {
         const response = await fetch(`https://zeynbot3.onrender.com/profile/${uuid}`);
         if (!response.ok) {
-            const errorText = await response.text(); // Get error details from the server
+            const errorText = await response.text(); 
             console.error("Ошибка при получении данных профиля:", response.status, response.statusText, errorText);
             throw new Error(`Ошибка при получении данных: ${response.status} - ${errorText}`);
         }
@@ -73,7 +73,7 @@ async function fetchAchievementsData(uuid) {
         return data;
     } catch (error) {
         console.error("Ошибка в fetchAchievementsData:", error);
-        throw error; // Re-throw the error to be handled by the caller
+        throw error; 
     }
 }
 
@@ -85,7 +85,7 @@ function displayProfileData(data) {
     if (!data || Object.keys(data).length === 0) return;
 
     if (data.userAvatar) {
-        profileAvatar.src = `https://zeynbot3.onrender.com/avatars/${data.userId}/${data.userAvatar}.webp`;
+        profileAvatar.src = `https://cdn.discordapp.com/avatars/${data.userId}/${data.userAvatar}.png`;
         profileAvatar.style.display = 'block';
     } else {
         profileAvatar.style.display = 'none';   
@@ -518,12 +518,12 @@ async function buyItem(uuid, itemName, quantity) {
         console.log("Результат покупки:", data);
         alert(data.message);
 
-        cachedProfileData[uuid] = null; // Invalidate cache
+        cachedProfileData[uuid] = null; 
 
         const updatedProfileData = await fetchProfileData(uuid);
         displayProfileData(updatedProfileData);
 
-        shopDataCache = null; // Invalidate shop cache
+        shopDataCache = null;
         await displayShopData(uuid);
     } catch (error) {
         console.error("Ошибка в buyItem:", error);
@@ -829,8 +829,8 @@ function createMessagesChart(data, label, days) {
     });
 }
 
-async function displayMessagesChart(userId, period) {
-    showStatsContent(false); 
+function displayMessagesChart(userId, period) {
+    showStatsContent(false);
     const messagesByDate = await fetchMessagesByDate(userId);
     if (!messagesByDate) return;
 
@@ -849,6 +849,11 @@ async function displayMessagesChart(userId, period) {
     }
 
     createMessagesChart(messagesByDate, label, days);
+
+    const messagesChart = document.getElementById('messagesChart');
+    if (messagesChart) {
+        messagesChart.addEventListener('click', () => showStatsContent(true));
+    }
 }
 
 function showStatsContent(show) {
