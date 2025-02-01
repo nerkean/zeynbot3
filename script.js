@@ -845,25 +845,50 @@ function createMessagesChart(data, label, days) {
 }
 
 async function displayMessagesChart(userId, period) {
-    showStatsContent(false); 
+    showStatsContent(false);
     const messagesByDate = await fetchMessagesByDate(userId);
     if (!messagesByDate) return;
 
     let label = '';
     let days = 0;
+    let data = {}; 
 
     if (period === 'all') {
         label = 'Сообщения за все время';
         days = Object.keys(messagesByDate).length;
+        data = messagesByDate;
     } else if (period === '7days') {
         label = 'Сообщения за последние 7 дней';
         days = 7;
+        data = filterMessagesByDays(messagesByDate, days);
     } else if (period === '30days') {
         label = 'Сообщения за последние 30 дней';
         days = 30;
+        data = filterMessagesByDays(messagesByDate, days);
+    } else if (period === '24hours') { // Добавляем обработку 24 часов
+        label = 'Сообщения за последние 24 часа';
+        days = 1;
+        data = filterMessagesByDays(messagesByDate, days);
     }
 
-    createMessagesChart(messagesByDate, label, days);
+    createMessagesChart(data, label, days);
+}
+
+// Вспомогательная функция для фильтрации сообщений за последние N дней
+function filterMessagesByDays(messagesByDate, days) {
+    const today = new Date();
+    const filteredData = {};
+    for (let i = 0; i < days; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        const dateString = date.toISOString().slice(0, 10); // Формат YYYY-MM-DD
+        if (messagesByDate[dateString]) {
+            filteredData[dateString] = messagesByDate[dateString];
+        } else {
+            filteredData[dateString] = 0; // Если сообщений не было, ставим 0
+        }
+    }
+    return filteredData;
 }
 
 function showStatsContent(show) {
