@@ -9,14 +9,10 @@ const profileAvatar = document.querySelector('.profile-avatar');
 const profileHeader = document.querySelector('.profile-header');
 const shopItemsContainer = document.querySelector('.shop-items');
 const errorContainer = document.getElementById('error-container');
+
 let shopDataCache = null; 
 let cachedUuid = null;
 let cachedProfileData = {};
-
-function addConfettiToZaqush() {
-    const zaqushMessagesElement = document.querySelector('#messages-leaderboard td:nth-child(3)'); // Замените на ваш селектор
-  
-  }
 
 const allowedRoleIds = ['1043565185509630022', '1243243180800082001', '1075072592005824563', '1043614651444899991', '1043615386660257872'];
 const roleToPosition = {
@@ -50,7 +46,7 @@ async function fetchProfileData(uuid) {
     try {
         const response = await fetch(`https://zeynbot3.onrender.com/profile/${uuid}`);
         if (!response.ok) {
-            const errorText = await response.text(); // Get error details from the server
+            const errorText = await response.text(); 
             console.error("Ошибка при получении данных профиля:", response.status, response.statusText, errorText);
             throw new Error(`Ошибка при получении данных: ${response.status} - ${errorText}`);
         }
@@ -78,7 +74,7 @@ async function fetchAchievementsData(uuid) {
         return data;
     } catch (error) {
         console.error("Ошибка в fetchAchievementsData:", error);
-        throw error; // Re-throw the error to be handled by the caller
+        throw error; 
     }
 }
 
@@ -93,7 +89,7 @@ function displayProfileData(data) {
         profileAvatar.src = `https://cdn.discordapp.com/avatars/${data.userId}/${data.userAvatar}.png`;
         profileAvatar.style.display = 'block';
     } else {
-        profileAvatar.style.display = 'none';   
+        profileAvatar.style.display = 'none';
     }
     profileUsername.textContent = `Добро пожаловать, ${data.username}!`;
 
@@ -138,12 +134,12 @@ function displayProfileData(data) {
         {
             name: 'Сообщения', value: [
                 { period: 'За все время', count: data.totalMessages },
-                { period: 'За 24 часа', count: data.messagesToday },
+                { period: 'За 24 часа', count: data.messagesToday }, 
                 { period: 'За 7 дней', count: data.messagesLast7Days, average: (data.messagesLast7Days / 7).toFixed(0) },
                 { period: 'За 30 дней', count: data.messagesLast30Days, average: (data.messagesLast30Days / 30).toFixed(0) }
             ],
         },
-        { name: 'Мьюты', value: data.totalMuteCount },
+        { name: 'Полученных мьютов', value: data.totalMuteCount },
         {
             name: 'Лутбоксы', value: [
                 { type: 'Всего', count: data.totalLootboxCount },
@@ -175,39 +171,48 @@ function displayProfileData(data) {
             nameElement.textContent = block.name;
             blockElement.appendChild(nameElement);
 
-            const valueElement = document.createElement('div');
-            valueElement.classList.add('profile-stat-value');
+            if (block.name === 'Сообщения') {
+                block.value.forEach((item) => {
+                    if (['За все время', 'За 7 дней', 'За 30 дней'].includes(item.period)) {
+                        const valueElement = document.createElement('div');
+                        valueElement.classList.add('profile-stat-value');
+                        valueElement.innerHTML = `${item.period}: ${item.count || item.rank} ${item.average ? `(в среднем ${item.average})` : ''}`;
 
-            if (Array.isArray(block.value)) {
-                let values = block.value.map(item => {
-                    if (item.period) {
-                        let text = `${item.period}: ${item.count || item.rank}`;
-                        if (item.average) {
-                            text += ` (в среднем ${item.average})`;
-                        }
-                        return text;
-                    } else if (item.type) {
-                        return `${item.type}: ${item.count}`;
+                        valueElement.style.cursor = 'pointer';
+                        valueElement.style.color = '#00FFFF';
+                        valueElement.addEventListener('click', () => displayMessagesChart(data.userId, item.period === 'За все время' ? 'all' : item.period === 'За 7 дней' ? '7days' : '30days'));
+                        blockElement.appendChild(valueElement);
+                    } else {
+                        const valueElement = document.createElement('div');
+                        valueElement.classList.add('profile-stat-value');
+                        valueElement.innerHTML = `${item.period}: ${item.count || item.rank} ${item.average ? `(в среднем ${item.average})` : ''}`;
+                        blockElement.appendChild(valueElement);
                     }
-                    return '';
-                }).join('<br>');
-
-                valueElement.innerHTML = values;
-
-                if (block.name === 'Сообщения') {
-                    block.value.forEach((item) => {
-                        if (['За все время', 'За 7 дней', 'За 30 дней'].includes(item.period)) {
-                            valueElement.style.cursor = 'pointer';
-                            valueElement.style.color = '#00FFFF';
-                            valueElement.addEventListener('click', () => displayMessagesChart(data.userId, item.period === 'За все время' ? 'all' : item.period === 'За 7 дней' ? '7days' : '30days'));
-                        }
-                    });
-                }
+                });
             } else {
-                valueElement.textContent = block.value;
+                const valueElement = document.createElement('div');
+                valueElement.classList.add('profile-stat-value');
+
+                if (Array.isArray(block.value)) {
+                    valueElement.innerHTML = block.value.map(item => {
+                        if (item.period) {
+                            let text = `${item.period}: ${item.count || item.rank}`;
+                            if (item.average) {
+                                text += ` (в среднем ${item.average})`;
+                            }
+                            return text;
+                        } else if (item.type) {
+                            return `${item.type}: ${item.count}`;
+                        }
+                        return '';
+                    }).join('<br>');
+                } else {
+                    valueElement.textContent = block.value;
+                }
+
+                blockElement.appendChild(valueElement);
             }
 
-            blockElement.appendChild(valueElement);
             profileStatsContainer.appendChild(blockElement);
         });
 
@@ -505,7 +510,7 @@ async function buyItem(uuid, itemName, quantity) {
         }
         console.log("userId:", userId);
 
-        const response = await fetch('http://zeynbot3.onrender.com/buy', {
+        const response = await fetch('https://zeynbot3.onrender.com/buy', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -523,12 +528,12 @@ async function buyItem(uuid, itemName, quantity) {
         console.log("Результат покупки:", data);
         alert(data.message);
 
-        cachedProfileData[uuid] = null; // Invalidate cache
+        cachedProfileData[uuid] = null; 
 
         const updatedProfileData = await fetchProfileData(uuid);
         displayProfileData(updatedProfileData);
 
-        shopDataCache = null; // Invalidate shop cache
+        shopDataCache = null;
         await displayShopData(uuid);
     } catch (error) {
         console.error("Ошибка в buyItem:", error);
@@ -545,12 +550,12 @@ function displayLeaderboardData(data, tableId) {
       
       const rankCell = document.createElement('td');
       rankCell.textContent = index + 1;
-      rankCell.setAttribute('data-label', '#'); // Добавляем data-label
+      rankCell.setAttribute('data-label', '#'); 
       row.appendChild(rankCell);
   
       const usernameCell = document.createElement('td');
       usernameCell.textContent = user.username;
-      usernameCell.setAttribute('data-label', 'Пользователь'); // Добавляем data-label
+      usernameCell.setAttribute('data-label', 'Пользователь'); 
       row.appendChild(usernameCell);
   
 
@@ -564,13 +569,13 @@ function displayLeaderboardData(data, tableId) {
         const valueCell = document.createElement('td');
         if (tableId === 'voice-leaderboard') {
           valueCell.textContent = formatVoiceTime(user.voiceTime);
-          valueCell.setAttribute('data-label', 'Время'); // Добавляем data-label
+          valueCell.setAttribute('data-label', 'Время'); 
         } else if (tableId === 'stars-leaderboard') {
           valueCell.textContent = `${Math.round(user.stars)} ⭐`;
-          valueCell.setAttribute('data-label', 'Звёзды'); // Добавляем data-label
+          valueCell.setAttribute('data-label', 'Звёзды');
         } else if (tableId === 'messages-leaderboard') {
           valueCell.textContent = user.totalMessages;
-          valueCell.setAttribute('data-label', 'Сообщения'); // Добавляем data-label
+          valueCell.setAttribute('data-label', 'Сообщения');
         }
         row.appendChild(valueCell);
 
@@ -752,7 +757,7 @@ function logout() {
     console.log("Выход из аккаунта");
     shopDataCache = null; 
     cachedProfileData = {}; 
-    window.location.href = 'https://bandazeyna.com';
+    window.location.href = 'https://bandazeyna.com/';
 }
 
 function showLoginButton() {
@@ -780,22 +785,29 @@ function createMessagesChart(data, label, days) {
     let chartCanvas = document.getElementById('messagesChart');
     let existingChart = Chart.getChart(chartCanvas);
 
+    if (existingChart) {
+        existingChart.destroy();
+    }
+
     if (!chartCanvas) {
         chartCanvas = document.createElement('canvas');
         chartCanvas.id = 'messagesChart';
         chartCanvas.width = 400;
         chartCanvas.height = 200;
-        
+
         const profileTabContent = document.querySelector('.profile-tab-content[data-tab="stats"]');
-        profileTabContent.appendChild(chartCanvas);
-        
-    } else if (existingChart) {
-        existingChart.destroy();
+        profileTabContent.insertBefore(chartCanvas, document.getElementById('backButton'));
     }
 
     const ctx = chartCanvas.getContext('2d');
-    const labels = Object.keys(data).slice(-days);
-    const values = Object.values(data).slice(-days);
+
+    let filteredData = data;
+    if (days === 7 || days === 30) {
+        filteredData = filterMessagesByDays(data, days);
+    }
+
+    const labels = Object.keys(filteredData);
+    const values = Object.values(filteredData);
 
     new Chart(ctx, {
         type: 'line',
@@ -851,80 +863,71 @@ async function displayMessagesChart(userId, period) {
 
     let label = '';
     let days = 0;
-    let data = {}; 
 
     if (period === 'all') {
         label = 'Сообщения за все время';
         days = Object.keys(messagesByDate).length;
-        data = messagesByDate;
     } else if (period === '7days') {
         label = 'Сообщения за последние 7 дней';
         days = 7;
-        data = filterMessagesByDays(messagesByDate, days);
     } else if (period === '30days') {
         label = 'Сообщения за последние 30 дней';
         days = 30;
-        data = filterMessagesByDays(messagesByDate, days);
-    } else if (period === '24hours') { // Добавляем обработку 24 часов
-        label = 'Сообщения за последние 24 часа';
-        days = 1;
-        data = filterMessagesByDays(messagesByDate, days);
     }
 
-    createMessagesChart(data, label, days);
-}
-
-// Вспомогательная функция для фильтрации сообщений за последние N дней
-function filterMessagesByDays(messagesByDate, days) {
-    const today = new Date();
-    const filteredData = {};
-    for (let i = 0; i < days; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        const dateString = date.toISOString().slice(0, 10); // Формат YYYY-MM-DD
-        if (messagesByDate[dateString]) {
-            filteredData[dateString] = messagesByDate[dateString];
-        } else {
-            filteredData[dateString] = 0; // Если сообщений не было, ставим 0
-        }
-    }
-    return filteredData;
+    createMessagesChart(messagesByDate, label, days);
 }
 
 function showStatsContent(show) {
     const statsContent = document.querySelector('.profile-stats');
     const staffStatsContent = document.querySelector('.profile-staff-stats');
-    let chartCanvas = document.getElementById('messagesChart');
-    const backButton = document.getElementById('backButton');
-    const profileTabContent = document.querySelector('.profile-tab-content[data-tab="stats"]');
+    const chartCanvas = document.getElementById('messagesChart');
+    let backButton = document.getElementById('backButton');
 
     if (show) {
         statsContent.style.display = 'block';
         staffStatsContent.style.display = 'block';
         if (chartCanvas) chartCanvas.style.display = 'none';
+
         if (backButton) backButton.remove();
     } else {
         statsContent.style.display = 'none';
         staffStatsContent.style.display = 'none';
+        if (chartCanvas) chartCanvas.style.display = 'block';
 
         if (!backButton) {
-            const newBackButton = document.createElement('button');
-            newBackButton.id = 'backButton';
-            newBackButton.textContent = 'Назад';
-            profileTabContent.appendChild(newBackButton);
-            newBackButton.addEventListener('click', () => showStatsContent(true));
-        }
+            backButton = document.createElement('button');
+            backButton.id = 'backButton';
+            backButton.textContent = 'Назад';
+            backButton.addEventListener('click', () => showStatsContent(true));
 
-        if (!chartCanvas) {
-            chartCanvas = document.createElement('canvas');
-            chartCanvas.id = 'messagesChart';
-            chartCanvas.width = 400;
-            chartCanvas.height = 200;
-            profileTabContent.insertBefore(chartCanvas, document.getElementById('backButton'));
-        }
+            const profileTabContent = document.querySelector('.profile-tab-content[data-tab="stats"]');
+            profileTabContent.appendChild(backButton);
 
-        chartCanvas.style.display = 'block';
+        }
     }
+}
+
+function filterMessagesByDays(messagesByDate, days) {
+    const today = new Date();
+    const filteredData = {};
+    const sortedKeys = []; 
+    for (let i = days - 1; i >= 0; i--) { 
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        const dateString = date.toISOString().slice(0, 10); 
+        sortedKeys.push(dateString); 
+    }
+
+    for (const key of sortedKeys) {
+        if (messagesByDate[key]) {
+            filteredData[key] = messagesByDate[key];
+        } else {
+            filteredData[key] = 0;
+        }
+    }
+
+    return filteredData;
 }
 
 function startCountdown(milliseconds) {
@@ -944,3 +947,4 @@ function startCountdown(milliseconds) {
         timeLeft -= 1;
     }, 1000);
 }
+
