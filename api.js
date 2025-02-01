@@ -11,6 +11,14 @@ const Item = require('./Item');
 const Inventory = require('./inventory');
 const { Client, IntentsBitField } = require('discord.js');
 const NodeCache = require('node-cache');
+const rateLimit = require("express-rate-limit");
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 100,
+    message: "Слишком много запросов с вашего IP, пожалуйста, попробуйте позже.",
+});
+
 const cache = new NodeCache({ stdTTL: 60 * 60 });
 const client = new Client({
     intents: [
@@ -27,13 +35,15 @@ const PORT = process.env.PORT || 10000;
 const LEADERBOARD_CACHE_TTL = 5 * 60;
 
 const corsOptions = {
-    origin: 'https://bandazeyna.com',
+    origin: 'http://127.0.0.1:5500',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 200,
     credentials: true
 };
 app.use(cors(corsOptions));
+
+app.use(limiter);
 
 app.use(express.json());
 
@@ -95,7 +105,7 @@ async function fetchUserGuildMember(userId) {
         });
 
         if (!response.ok) {
-            const errorData = await response.json(); // Try to get error details
+            const errorData = await response.json();
             console.error(`Ошибка получения данных пользователя ${userId}: ${response.status} ${response.statusText}`, errorData);
             throw new Error(`Failed to fetch user guild member: ${response.status} ${response.statusText}`);
         }
@@ -113,7 +123,7 @@ async function fetchUserGuildMember(userId) {
 passport.use(new DiscordStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: 'https://zeynbot3.onrender.com/auth/callback',
+    callbackURL: 'http://localhost:3000/auth/callback',
     scope: ['identify', 'guilds.members.read']
 },
 async (accessToken, refreshToken, profile, done) => {
@@ -140,7 +150,7 @@ async (accessToken, refreshToken, profile, done) => {
         const userGuildMember = await fetchUserGuildMember(profile.id);
         if (!userGuildMember) {
             console.error('Не удалось получить данные пользователя с сервера Discord');
-            return done(new Error('Failed to fetch user guild member')); // Important: Handle the error
+            return done(new Error('Failed to fetch user guild member')); 
         }
 
         const userRolesIds = userGuildMember.roles;
@@ -466,14 +476,14 @@ app.get('/auth/discord', (req, res, next) => {
 });
 
 app.get('/auth/callback',
-    passport.authenticate('discord', { failureRedirect: '/' }), // Handle failure
+    passport.authenticate('discord', { failureRedirect: '/' }), 
     async (req, res) => {
         try {
             const user = await CommandStats.findOne({ userId: req.user.userId }).select('uuid');
             if (!user) {
                 return res.status(404).send('User not found');
             }
-            res.redirect(`https://bandazeyna.com?uuid=${user.uuid}`);
+            res.redirect(`http://127.0.0.1:5500/index.html?uuid=${user.uuid}`);
         } catch (error) {
             console.error("Error in /auth/callback:", error);
             res.status(500).send("An error occurred during authentication.");
