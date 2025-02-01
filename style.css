@@ -50,6 +50,7 @@ body {
   padding: 40px;
   margin-bottom: 40px;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: fadeIn 1.5s ease;
   position: relative;
 }
 
@@ -284,7 +285,7 @@ body {
     padding: 30px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     animation: fadeInUp 1s ease;
-    width: 100%; /* Убрал дублирование */
+    width: 100%; 
 }
 
 .leaderboard-voice h2,
@@ -296,7 +297,6 @@ body {
     text-align: center;
 }
 
-/* Стили для больших экранов (ширина больше 768px) */
 .container {
     width: 80%;
     margin: 0 auto;
@@ -569,7 +569,6 @@ body {
     padding: 15px;
   }
 
-  /* Адаптивная таблица (способ 3) */
   .leaderboard-table {
     border: 0;
   }
@@ -771,7 +770,6 @@ body {
   }
 }
 
-/* Media Queries */
 @media (max-width: 900px) {
   .shop-item {
     width: calc(50% - 30px);
@@ -784,7 +782,6 @@ body {
   }
 }
 
-/* Стили для больших экранов (ширина больше 768px) */
 .container {
   width: 80%;
   margin: 0 auto;
@@ -797,7 +794,6 @@ body {
 }
 
 
-/* Стили для планшетов (ширина от 481px до 768px) */
 @media (max-width: 768px) {
   .container {
     width: 90%;
@@ -819,8 +815,6 @@ body {
     margin-bottom: 20px;
   }
 }
-
-/* Стили для мобильных телефонов (ширина до 480px) */
 
   .container {
     width: 100%;
@@ -861,12 +855,12 @@ body {
   }
 
   #messages-leaderboard tr.zaqush-row td:nth-child(3):hover {
-    animation: rainbow-text 3s linear infinite, rainbow-glow 0.5s linear infinite 0.2s; /* Добавлена задержка 0.2s для тени */
+    animation: rainbow-text 3s linear infinite, rainbow-glow 0.5s linear infinite 0.2s;
   }
 
   @keyframes rainbow-text {
     0% { color: var(--red); }
-    7% { color: rgb(255, 128, 0); } /* Более плавные переходы */
+    7% { color: rgb(255, 128, 0); } 
     14% { color: var(--orange); }
     21% { color: rgb(255, 255, 0); }
     28% { color: var(--yellow); }
